@@ -1,0 +1,33 @@
+Pour faire évoluer un code Python qui lit aujourd’hui des fichiers JSON et CSV vers un système capable de gérer de très
+gros volumes de données (plusieurs To ou millions de fichiers), il sera nécessaire de faire évoluer l’architecture
+globale, et pas uniquement le code.
+
+Les principaux points à considérer sont :
+
+1. Lecture de données
+Problème : la lecture brute de fichiers CSV ou JSON est lente et consomme énormément de RAM.
+Sur de gros volumes, cela devient vite ingérable.
+
+Évolutions possibles :
+* Lecture par morceaux (chunking) pour limiter l’usage mémoire.
+* Utilisation de formats optimisés pour le Big Data comme Parquet ou ORC.
+
+2. Stockage
+Les données brutes ou transformées peuvent être stockées dans :
+
+* Une base SQL locale ou distante (PostgreSQL, SQL Server…).
+* Un data warehouse cloud comme BigQuery, Snowflake, Redshift, pour bénéficier de la scalabilité et de la lecture optimisée sur gros volumes.
+* Dans un contexte Big Data, un stockage objet (S3, GCS, Azure Blob) est préférable pour les fichiers.
+
+3. Recherche et indexation
+Pour améliorer les performances de recherche et filtrage :
+
+* Mettre en place des index sur les colonnes utilisées fréquemment dans les requêtes.
+* Dans le cas de gros fichiers Parquet, utiliser le partitionnement et/ou le clustering pour limiter
+ la quantité de données scannée.
+
+4. Traitement parallélisé
+Le traitement séquentiel Python classique ne suffit pas sur plusieurs To.
+
+Utiliser des frameworks de calcul distribué tel que Apache Spark (via PySpark)
+
