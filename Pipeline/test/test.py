@@ -1,18 +1,31 @@
 import pandas as pd
+import unittest
 
 from ..src.transformers.cleaner import clean
 
 
-def test_remove_duplicates():
-    data = {
-        "title": ["Study A", "Study A", "Study B"],
-        "journal": ["Journal X", "Journal X", "Journal Y"],
-        "date": ["2020-01-01", "27 April 2020", "2020-01-02"]
-    }
-    df = pd.DataFrame(data)
-    
-    cleaned_df = clean(df)
+class TestClean(unittest.TestCase):
 
-    assert len(cleaned_df) == 2
-    assert cleaned_df["title"].tolist() == ["Study A", "Study B"]
-    print("Cleaning passed.")
+
+    def test_clean(self):
+        # Arrange: create a DataFrame with dirty data
+        df = pd.DataFrame({
+            "title": [" Hello ", "   ", "World"],
+            "journal": ["Science", None, " Nature "],
+            "date": ["01/01/2020", "  ", "5 May 2021"]
+        })
+
+        # Act
+        result = clean(df)
+
+        # Assert
+
+        # 1. Row with empty/space-only title should be removed
+        self.assertEqual(len(result), 2)
+        self.assertNotIn("   ", result["title"].values)
+
+        # 2. All date values should be parsed into datetime-like objects
+        self.assertTrue(pd.api.types.is_datetime64_any_dtype(result["date"]))
+
+        # 3. No NaN values in 'title' column
+        self.assertFalse(result["title"].isna().any())
