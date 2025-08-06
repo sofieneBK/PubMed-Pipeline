@@ -1,13 +1,43 @@
+"""
+Drug mentions mapping module for PubMed Pipeline.
+
+This module provides functionality to map drugs to publications that mention them,
+creating a comprehensive dictionary of drug-publication relationships.
+"""
+
 import re
 
 import pandas as pd
 
 
 def map_drugs_to_publication_mentions(drugs_df: pd.DataFrame, publications_df: pd.DataFrame) -> dict:
-
     """
-    For each drug in `drugs`, find publications mentioning it and
-    return a dictionary mapping drug names to a list of publication details.
+    Map each drug to publications that mention it in their titles.
+
+    Searches for exact word matches of drug names in publication titles using
+    regex patterns. Returns a dictionary where each drug name maps to a list
+    of publication details that mention that drug.
+
+    Args:
+        drugs_df (pd.DataFrame): DataFrame containing drug information with 'drug' column.
+        publications_df (pd.DataFrame): DataFrame containing publication data with columns:
+            - 'title': Publication title to search in
+            - 'journal': Publication journal name
+            - 'date': Publication date
+            - 'source': Publication source
+
+    Returns:
+        dict: Dictionary mapping drug names (str) to lists of publication dictionaries.
+              Each publication dictionary contains:
+              - 'title': Publication title
+              - 'journal': Journal name
+              - 'date': Publication date
+              - 'source': Publication source
+
+    Note:
+        Uses whole-word matching to avoid partial matches (e.g., 'aspirin' won't 
+        match 'aspirinate'). Drug names with special regex characters are 
+        automatically escaped.
     """
 
     drug_mentions_map = {}

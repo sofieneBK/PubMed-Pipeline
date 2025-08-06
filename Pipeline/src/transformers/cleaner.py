@@ -1,10 +1,25 @@
+"""
+Data cleaning and transformation module for PubMed Pipeline.
+
+This module provides functions to clean and process clinical trials, PubMed,
+and drugs data for analysis.
+"""
+
 import numpy as np
 
 from ..utils.utils import *
 
 
-############## process clinical trials data
 def process_clinical_trials_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Process clinical trials dataframe by renaming columns and merging rows.
+
+    Args:
+        df (pd.DataFrame): Raw clinical trials dataframe.
+
+    Returns:
+        pd.DataFrame: Processed clinical trials dataframe with 'source' column.
+    """
 
     # rename column : 
     df = df.rename(columns={"scientific_title": "title"})
@@ -20,8 +35,18 @@ def process_clinical_trials_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-############## process pubmed data
+
 def process_pubmed_dataframe(pubcsv: pd.DataFrame, pubjson: pd.DataFrame) -> pd.DataFrame:
+    """
+    Process PubMed CSV and JSON dataframes into a single dataframe.
+
+    Args:
+        pubcsv (pd.DataFrame): PubMed data from CSV file.
+        pubjson (pd.DataFrame): PubMed data from JSON file.
+
+    Returns:
+        pd.DataFrame: Combined PubMed dataframe with 'source' column.
+    """
     df = pd.concat([pubcsv, pubjson], ignore_index=True)
     
     #  column source to know which source it came from
@@ -29,14 +54,38 @@ def process_pubmed_dataframe(pubcsv: pd.DataFrame, pubjson: pd.DataFrame) -> pd.
 
     return df
 
-############## process drugs data
+
 def process_drugs(drug: pd.DataFrame) -> pd.DataFrame:
+    """
+    Process drugs data by standardizing drug names.
+
+    Args:
+        drug (pd.DataFrame): Raw drugs dataframe.
+
+    Returns:
+        pd.DataFrame: Processed drugs dataframe with standardized drug names.
+    """
     drug['drug'] = drug['drug'].apply(standardize_text)
     return drug
 
 
-# ########### Global cleaning
-def clean(df: pd.DataFrame)-> pd.DataFrame:
+
+def clean(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Apply global cleaning operations to any dataframe.
+
+    Performs the following operations:
+    - Replace empty strings with NaN values
+    - Remove rows with missing titles
+    - Parse and standardize dates
+    - Standardize text in title and journal columns
+
+    Args:
+        df (pd.DataFrame): Input dataframe to clean.
+
+    Returns:
+        pd.DataFrame: Cleaned dataframe.
+    """
     
     # manage spaces and replace them with NaN values
     for column in df.columns:
